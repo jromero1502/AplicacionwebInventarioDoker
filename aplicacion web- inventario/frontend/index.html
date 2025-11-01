@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inventario sencillo</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h4>Andrey Steven Suarez Suarez</h4>
+      <h4>Miguel Angel Roa Pinzón</h4>
+      <h4>Julian David Romero Hernandez</h4>
+      <h1>Requisitos</h1>
+      <div class="muted">Selección de imagen</div>
+    </header>
+
+    <section class="card">
+      <form id="itemForm" class="form-grid">
+        <div class="form-left">
+          <label for="name">Nombre</label>
+          <input id="name" type="text" required placeholder="Ej: Tornillos M4" />
+
+          <label for="qty" class="mt8">Cantidad</label>
+          <input id="qty" type="number" min="0" value="1" required />
+
+          <label for="price" class="mt8">Precio (COP)</label>
+          <input id="price" type="number" step="0.01" min="0" value="0.00" required />
+
+          <label for="desc" class="mt8">Descripción (opcional)</label>
+          <textarea id="desc" placeholder="Detalles, ubicación..."></textarea>
+        </div>
+
+        <div class="form-right">
+          <label for="imageInput">Imagen</label>
+          <div class="img-preview" id="preview">
+            <span class="muted small">Sin imagen</span>
+          </div>
+          <input id="imageInput" type="file" accept="image/*" class="mt8" />
+
+          <div class="controls mt12">
+            <button id="addBtn" type="submit">Agregar</button>
+            <button id="clearBtn" type="button" class="ghost">Limpiar</button>
+          </div>
+        </div>
+      </form>
+
+      <h2 class="inventory-title">Lista de inventario</h2>
+      <div id="items" class="grid" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <!-- Modal edición -->
+  <div id="modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal">
+      <h2 id="modalTitle">Editar item</h2>
+      <div class="row">
+        <div style="flex:1">
+          <label>Nombre</label>
+          <input id="e_name" type="text" />
+
+          <label class="mt8">Cantidad</label>
+          <input id="e_qty" type="number" min="0" />
+
+          <label class="mt8">Precio (COP)</label>
+          <input id="e_price" type="number" step="0.01" min="0" />
+
+          <label class="mt8">Descripción</label>
+          <textarea id="e_desc"></textarea>
+        </div>
+        <div style="width:auto;max-width:220px">
+          <label>Imagen</label>
+          <div class="img-preview" id="e_preview">
+            <span class="muted small">Sin imagen</span>
+          </div>
+          <input id="e_imageInput" type="file" accept="image/*" class="mt8" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveEdit">Guardar</button>
+        <button id="closeModal" class="ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

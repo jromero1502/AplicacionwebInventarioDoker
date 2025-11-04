@@ -15,17 +15,8 @@
 
 # Estructura del proyecto
 Aplicación web-inventario/
-├── backend/
-│ ├── Dockerfile
-│ ├── package.json
-│ ├── server.js
-│ └── data.json
-├── frontend/
-│ ├── Dockerfile
-│ ├── nginx.conf
-│ ├── index.html
-│ ├── styles.css
-│ └── app.js
+├── backend/: ├── Dockerfile ├── package.json ├── server.js├── data.json
+├── frontend/: ├── Dockerfile ├── nginx.conf ├── index.html ├── styles.css ├── app.js
 └── docker-compose.yml
 
 #Configuración (Prerrequisitos)
@@ -77,6 +68,7 @@ Las contribuciones son bienvenidas. Por favor, abre un 'issue' o envía un 'pull
 * **Autores:** [Julian David Romero Hernandez / Jhoan Prieto Sanchez / Jeisson Camilo Lopez Bello / Miguel Ángel Roa Pinzón / Andrey Suarez Suarez]
 * **Email:** [Janprietos@poligran.edu.co / mangroa@poligran.edu.co / jdavidromero@poligran.edu.co / jcamilolopez3@poligran.edu.co /  astsuarez@poligran.edu.co]
 * **Subgrupo:**[6].
+
 
 
 

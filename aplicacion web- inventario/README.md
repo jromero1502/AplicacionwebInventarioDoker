@@ -1,10 +1,10 @@
 ﻿# Aplicacion web de Inventario
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 |                       Titulo                 |                                                                              Contenido                                                                  |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| # Aplicación Web de Inventario Contenerizada |  Descripción concisa del propósito del proyecto (Ej: Un sistema modular para la gestión de inventario, implementado con arquitectura de microservicios).|
-| # Tecnologías Clave                          |  Listado de las herramientas principales: Node.js, Nginx, Docker, Docker Compose.                                                                       |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ** Aplicación Web de Inventario Contenerizada** |  Descripción concisa del propósito del proyecto (Ej: Un sistema modular para la gestión de inventario, implementado con arquitectura de microservicios).|
+| ** Tecnologías Clave**                          |  Listado de las herramientas principales: Node.js, Nginx, Docker, Docker Compose.                                                                       |
+
 
 # Arquitectura del proyecto
 
@@ -77,6 +77,7 @@ Las contribuciones son bienvenidas. Por favor, abre un 'issue' o envía un 'pull
 * **Autores:** [Julian David Romero Hernandez / Jhoan Prieto Sanchez / Jeisson Camilo Lopez Bello / Miguel Ángel Roa Pinzón / Andrey Suarez Suarez]
 * **Email:** [Janprietos@poligran.edu.co / mangroa@poligran.edu.co / jdavidromero@poligran.edu.co / jcamilolopez3@poligran.edu.co /  astsuarez@poligran.edu.co]
 * **Subgrupo:**[6].
+
 
 
 

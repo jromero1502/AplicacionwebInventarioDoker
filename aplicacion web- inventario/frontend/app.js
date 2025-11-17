@@ -1,6 +1,7 @@
 // frontend/app.js
 document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_KEY = 'inventario_simple_v1';
+  const THEME_KEY = 'theme_preference';
 
   const form = document.getElementById('itemForm');
   const nameInput = document.getElementById('name');
@@ -11,18 +12,133 @@ document.addEventListener('DOMContentLoaded', () => {
   const preview = document.getElementById('preview');
   const itemsEl = document.getElementById('items');
   const clearBtn = document.getElementById('clearBtn');
+  
+  // Elementos de tema y búsqueda
+  const themeToggle = document.getElementById('themeToggle');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
 
   const modal = document.getElementById('modal');
   const e_imageInput = document.getElementById('e_imageInput');
   const e_preview = document.getElementById('e_preview');
 
+  // Estado de filtro (item seleccionado desde búsqueda)
+  let selectedItemId = null;
+  const clearFilterBtn = document.getElementById('clearFilterBtn');
+
   let items = [];           // datos desde el servidor
   let currentImageData = null;
   let backendAvailable = true;
 
+  // Inicializar tema
+  initTheme();
+
   // carga inicial
   fetchItems().then(() => render());
 
+  // --- Theme toggle ---
+  function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem(THEME_KEY, newTheme);
+    });
+  }
+
+  // --- Search functionality ---
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  function performSearch(query) {
+    if (!query.trim() || !searchResults) {
+      if (searchResults) searchResults.classList.remove('active');
+      return;
+    }
+
+    const results = items.filter(item => 
+      item.name.toLowerCase().includes(query.toLowerCase()) ||
+      (item.desc && item.desc.toLowerCase().includes(query.toLowerCase()))
+    );
+
+    if (results.length === 0) {
+      searchResults.innerHTML = '<div class="search-item">No se encontraron resultados</div>';
+    } else {
+      searchResults.innerHTML = results.map(item => `
+        <div class="search-item" data-id="${item.id}">
+          <div class="search-item-thumb">
+            ${item.img 
+              ? `<img src="${item.img}" alt="${item.name}">` 
+              : '<div class="no-image">Sin imagen</div>'
+            }
+          </div>
+          <div class="search-item-info">
+            <div class="search-item-name">${item.name}</div>
+            <div class="search-item-meta">
+              Cantidad: ${item.qty} | Precio: ${formatCOP(item.price)}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Agregar listeners a los resultados: al hacer click, filtrar la lista principal
+      searchResults.querySelectorAll('.search-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const itemId = el.dataset.id;
+          // Marcar item seleccionado para filtrar la lista
+          selectedItemId = itemId;
+          // Mostrar solo el item seleccionado
+          render();
+          // Mostrar botón para limpiar el filtro
+          if (clearFilterBtn) clearFilterBtn.style.display = 'inline-flex';
+          // Limpiar búsqueda
+          if (searchInput) searchInput.value = '';
+          if (searchResults) searchResults.classList.remove('active');
+          // Llevar la vista a la lista
+          if (itemsEl) itemsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+    
+    searchResults.classList.add('active');
+  }
+
+  const debouncedSearch = debounce(performSearch, 300);
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    searchInput.addEventListener('focus', () => {
+      if (searchInput.value.trim() && searchResults) {
+        searchResults.classList.add('active');
+      }
+    });
+  }
+
+  // Cerrar resultados al hacer clic fuera
+  if (searchResults) {
+    document.addEventListener('click', (e) => {
+      if (!searchResults.contains(e.target) && e.target !== searchInput) {
+        searchResults.classList.remove('active');
+      }
+    });
+  }
   // --- Image upload handlers ---
   imageInput.addEventListener('change', e => {
     const file = e.target.files && e.target.files[0];
@@ -100,14 +216,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Render items list ---
   function render() {
     itemsEl.innerHTML = '';
-    if (!items.length) {
+    const list = selectedItemId ? items.filter(i => i.id === selectedItemId) : items;
+
+    if (!list.length) {
       itemsEl.innerHTML = '<div class="muted" style="padding:12px">No hay items. Agrega uno usando el formulario.</div>';
       return;
     }
 
-    items.forEach(it => {
+    // Mostrar/ocultar botón limpiar filtro
+    if (clearFilterBtn) {
+      clearFilterBtn.style.display = selectedItemId ? 'inline-flex' : 'none';
+    }
+
+    list.forEach(it => {
       const card = document.createElement('div');
       card.className = 'item';
+      card.setAttribute('data-id', it.id);
 
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
@@ -119,16 +243,36 @@ document.addEventListener('DOMContentLoaded', () => {
         thumb.innerHTML = '<div style="padding:6px;color:var(--muted);font-size:12px">Sin imagen</div>';
       }
 
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const h = document.createElement('h3');
-      h.textContent = it.name;
-      const p = document.createElement('p');
-      p.innerHTML = `<strong>Cantidad:</strong> ${it.qty} <br>
-                     <strong>Precio:</strong> ${formatCOP(it.price || 0)} <br>
-                     <span class="muted">${it.desc || ''}</span>`;
-      meta.appendChild(h);
-      meta.appendChild(p);
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+
+  // título
+  const h = document.createElement('h3');
+  h.textContent = it.name;
+
+  // info horizontal (cantidad + precio)
+  const info = document.createElement('div');
+  info.className = 'info';
+
+  const qtyDiv = document.createElement('div');
+  qtyDiv.className = 'info-item';
+  qtyDiv.innerHTML = `<strong>Cantidad:</strong> ${it.qty}`;
+
+  const priceDiv = document.createElement('div');
+  priceDiv.className = 'info-item';
+  priceDiv.innerHTML = `<strong>Precio:</strong> ${formatCOP(it.price || 0)}`;
+
+  info.appendChild(qtyDiv);
+  info.appendChild(priceDiv);
+
+  // descripción como párrafo separado (permitir justificarse horizontalmente)
+  const descP = document.createElement('p');
+  descP.className = 'desc';
+  descP.textContent = it.desc || '';
+
+  meta.appendChild(h);
+  meta.appendChild(info);
+  meta.appendChild(descP);
 
       const actions = document.createElement('div');
       actions.className = 'actions';
@@ -159,6 +303,17 @@ document.addEventListener('DOMContentLoaded', () => {
       card.appendChild(meta);
       card.appendChild(actions);
       itemsEl.appendChild(card);
+    });
+  }
+
+  // Botón para limpiar el filtro y volver a la lista completa
+  if (clearFilterBtn) {
+    clearFilterBtn.addEventListener('click', () => {
+      selectedItemId = null;
+      if (clearFilterBtn) clearFilterBtn.style.display = 'none';
+      render();
+      // enfocar campo búsqueda opcional
+      if (searchInput) searchInput.focus();
     });
   }
 

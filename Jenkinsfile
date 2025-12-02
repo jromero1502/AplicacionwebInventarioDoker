@@ -28,8 +28,13 @@ pipeline {
         stage('Run unit tests') {
             steps {
                 sh '''
+                    echo "Instalando dependencias backend"
+                    npm --prefix "./aplicacion web- inventario/backend" ci
                     echo "Se ejecutarán pruebas unitarias de backend..."
                     npm --prefix "./aplicacion web- inventario/backend" run test
+
+                    echo "Instalando dependencias frontend"
+                    npm --prefix "./aplicacion web- inventario/frontend" ci
                     echo "Se ejecutarán pruebas unitarias de frontend"
                     npm --prefix "./aplicacion web- inventario/frontend" run test
                 '''

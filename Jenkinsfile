@@ -25,6 +25,17 @@ pipeline {
             }
         }
 
+        stage('Run unit tests') {
+            steps {
+                sh '''
+                    echo "Se ejecutarán pruebas unitarias de backend..."
+                    npm --prefix "./aplicacion web- inventario/backend" run test
+                    echo "Se ejecutarán pruebas unitarias de frontend"
+                    npm --prefix "./aplicacion web- inventario/frontend" run test
+                '''
+            }
+        }
+
         stage('Levantar con docker compose') {
             steps {
                 sh '''

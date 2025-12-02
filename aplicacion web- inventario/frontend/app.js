@@ -1,5 +1,33 @@
 // frontend/app.js
-document.addEventListener('DOMContentLoaded', () => {
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function formatCOP(value) {
+  const intVal = Math.round(Number(value) || 0);
+  return `$${intVal.toLocaleString('es-CO')} COP`;
+}
+
+function searchItems(collection = [], query = '') {
+  const term = (query || '').trim().toLowerCase();
+  if (!term) return [];
+  return collection.filter(item => {
+    const name = (item.name || '').toLowerCase();
+    const desc = (item.desc || '').toLowerCase();
+    return name.includes(term) || desc.includes(term);
+  });
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_KEY = 'inventario_simple_v1';
   const THEME_KEY = 'theme_preference';
 
@@ -52,28 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Search functionality ---
-  function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
   function performSearch(query) {
     if (!query.trim() || !searchResults) {
       if (searchResults) searchResults.classList.remove('active');
       return;
     }
 
-    const results = items.filter(item => 
-      item.name.toLowerCase().includes(query.toLowerCase()) ||
-      (item.desc && item.desc.toLowerCase().includes(query.toLowerCase()))
-    );
+    const results = searchItems(items, query);
 
     if (results.length === 0) {
       searchResults.innerHTML = '<div class="search-item">No se encontraron resultados</div>';
@@ -206,11 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentImageData = null;
     setPreview(null);
     nameInput.focus();
-  }
-
-  function formatCOP(value) {
-    const intVal = Math.round(Number(value) || 0);
-    return `$${intVal.toLocaleString('es-CO')} COP`;
   }
 
   // --- Render items list ---
@@ -483,4 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!res.ok) throw new Error('no delete');
     return;
   }
-});
+  });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { debounce, formatCOP, searchItems };
+}
